@@ -20,75 +20,82 @@ const connSettings = {
      // You can use a key file too, read the ssh2 documentation
 };
 
-
 const conn = new Client();
-// conn.on('ready', function() {
-//     conn.sftp(function(err, sftp) {
-//          if (err) throw err;
-//          if ('undefined' === process.argv[2] || !['r', 'w'].includes(process.argv[2]) ){
-//             process.argv[2] = 'd';
-//          }
-//          switch (process.argv[2]) {
-//             case 'd': 
-//                 sftp.readdir(remotePathToList, function(err, list) {
-//                 if (err) throw err;
-//                 // List the directory in the console
-//                 console.dir(list);
-//                 // Do not forget to close the connection, otherwise you'll get troubles
-//                 // conn.end();
-//                 });
 
-//                 break;
-//             case 'w':
-                
-//                 break;
-//             case 'r':
-//                 // SILENT.  NO ERRORS BUT NOTHING MOVES
-//                 var moveFrom = '/Development/' + process.argv[4];  
-//                 var moveTo = process.argv[3];
-//                 console.log(`Get from ${moveFrom}...`);
-//                 console.log(`Write to ${moveTo}...`);
-//                 sftp.fastGet(moveFrom, moveTo , {}, function(downloadError){
-//                     if(downloadError) throw downloadError;
-//                     console.log("Succesfully xxxxloaded");
-//                 });
-//                 break;
-//             default:
-//                 console.log(`Should never see this.`);// todo
-//          }
-//          console.log(`...Ta Ta ${process.env.OFFSUP_USER}.`)
-//          conn.end();
-//     });
-conn.on('ready', () => {
-     conn.sftp(function(err, sftp) {
-         if (err) throw err;
+
+switch (process.argv[2]) {
+
+
+case 'd': 
+    conn.on('ready', function() {
+        conn.sftp(function(err, sftp) {
+             if (err) throw err;
+             if ('undefined' === process.argv[2] || !['r', 'w'].includes(process.argv[2]) ){
+                process.argv[2] = 'd';
+             }
+            sftp.readdir(remotePathToList, function(err, list) {
+                if (err) throw err;
+                // List the directory in the console
+                console.dir(list);
+                // Do not forget to close the connection, otherwise you'll get troubles
+            });
+            console.log(`...Ta Ta ${process.env.OFFSUP_USER}.`);
+            conn.end();
+        });
+    });
+    break;
+
+
+case 'w':
+    conn.on('ready', () => {
+         conn.sftp(function(err, sftp) {
+            if (err) throw err;
 
             distalpath = '/Development/' + process.argv[4];  
             localpath = process.argv[3];
             console.log(`Get from ${localpath}...`);
             console.log(`Write to ${distalpath}...`);
 
+            const fs = require('fs');
+            const readStream = fs.createReadStream( localpath );
+            const writeStream = sftp.createWriteStream( distalpath );
 
+            writeStream.on('close',function () {
+                console.log( "- file transferred succesfully" );
+                conn.end();
+            });
 
-        const fs = require('fs');
-        const readStream = fs.createReadStream( localpath );
-        const writeStream = sftp.createWriteStream( distalpath );
+            // process seems to still work if you comment out the following:
+            writeStream.on('end', function () {
+                console.log( "sftp connection closed" );
+            });
 
-
-
-        writeStream.on('close',function () {
-            console.log( "- file transferred succesfully" );
-            conn.end();
+            // initiate transfer of file
+            readStream.pipe( writeStream );
+            
         });
+    }).connect(connSettings);
+    break;
 
-        // process seems to still work if you comment out the following:
-        writeStream.on('end', function () {
-            console.log( "sftp connection closed" );
 
+
+
+    case 'r':
+        // SILENT.  NO ERRORS BUT NOTHING MOVES
+        var moveFrom = '/Development/' + process.argv[4];  
+        var moveTo = process.argv[3];
+        console.log(`Get from ${moveFrom}...`);
+        console.log(`Write to ${moveTo}...`);
+        sftp.fastGet(moveFrom, moveTo , {}, function(downloadError){
+            if(downloadError) throw downloadError;
+            console.log("Succesfully xxxxloaded");
         });
+    break;
 
-        // initiate transfer of file
-        readStream.pipe( writeStream );
-        
-    });
-}).connect(connSettings);
+
+    default:
+        console.log(`Should never see this.`);// todo
+}
+
+
+
