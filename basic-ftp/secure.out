@@ -1,0 +1,60 @@
+Connected to 75.101.155.12:21
+< 220 Service ready for new user.
+> AUTH TLS
+< 234 Command AUTH okay; starting TLS connection.
+Error [ERR_TLS_CERT_ALTNAME_INVALID]: Hostname/IP does not match certificate's altnames: Host: ftp1.officesupply.com. is not in the cert's altnames: DNS:*.hostedftp.com, DNS:hostedftp.com
+    at Object.checkServerIdentity (tls.js:288:12)
+    at TLSSocket.onConnectSecure (_tls_wrap.js:1484:27)
+    at TLSSocket.emit (events.js:321:20)
+    at TLSSocket._finishInit (_tls_wrap.js:917:8)
+    at TLSWrap.ssl.onhandshakedone (_tls_wrap.js:687:12) {
+  reason: "Host: ftp1.officesupply.com. is not in the cert's altnames: DNS:*.hostedftp.com, DNS:hostedftp.com",
+  host: 'ftp1.officesupply.com',
+  cert: {
+    subject: [Object: null prototype] {
+      C: 'CA',
+      ST: 'Ontario',
+      L: 'Kitchener',
+      O: 'Hosted FTP Inc.',
+      CN: '*.hostedftp.com'
+    },
+    issuer: [Object: null prototype] {
+      C: 'US',
+      O: 'DigiCert Inc',
+      CN: 'DigiCert SHA2 Secure Server CA'
+    },
+    subjectaltname: 'DNS:*.hostedftp.com, DNS:hostedftp.com',
+    infoAccess: [Object: null prototype] {
+      'OCSP - URI': [Array],
+      'CA Issuers - URI': [Array]
+    },
+    modulus: 'AD86A579FEBE2A9D05828CA5CB074D6D3799BB7399A3B520AB40CF9948E5289DB8A4E66598B89F30426788D5609D531020E2D188F9F5832C208FC51CE32A9274A7F611137DCFAD6961B8F557CC411A317AEB0EDEE0ABC917320C539D43DA666D6E8B30AE6AC0796FCC350F2634AC1FE20A8C1746675D1DADC923B8B118FAACF0F977D6F3BA46F00B39DFE9019EA4D41A063F1CD6393965FD1227EFE75250019C74B38495D536373C486744122FADEDC90490CE7FB9871F66A6A3F4416C288D77556DBDB269C3A9F02C4A0FA5BD739E3A47D5EFBC3D7BE328177FC34F0B1DABF4EE129BFAC4F5A4E2F366EC30A51D5349E29A4AD8D93CF78DCEC4BAA6AD501B05',
+    bits: 2048,
+    exponent: '0x10001',
+    pubkey: <Buffer 30 82 01 22 30 0d 06 09 2a 86 48 86 f7 0d 01 01 01 05 00 03 82 01 0f 00 30 82 01 0a 02 82 01 01 00 ad 86 a5 79 fe be 2a 9d 05 82 8c a5 cb 07 4d 6d 37 ... 244 more bytes>,
+    valid_from: 'Dec  2 00:00:00 2019 GMT',
+    valid_to: 'Mar  6 00:00:00 2022 GMT',
+    fingerprint: 'E8:E7:FC:ED:D6:16:FF:AE:56:81:18:51:86:3F:25:34:78:6B:A1:FD',
+    fingerprint256: '71:9C:33:34:62:88:DA:12:03:82:D9:89:77:A8:25:A5:6B:B5:64:B9:64:AB:6E:00:7D:74:AE:6A:99:D8:DD:E1',
+    ext_key_usage: [ '1.3.6.1.5.5.7.3.1', '1.3.6.1.5.5.7.3.2' ],
+    serialNumber: '078C104F96BC8CD8AE4714DB66ADDA5E',
+    raw: <Buffer 30 82 07 20 30 82 06 08 a0 03 02 01 02 02 10 07 8c 10 4f 96 bc 8c d8 ae 47 14 db 66 ad da 5e 30 0d 06 09 2a 86 48 86 f7 0d 01 01 0b 05 00 30 4d 31 0b ... 1778 more bytes>,
+    issuerCertificate: {
+      subject: [Object: null prototype],
+      issuer: [Object: null prototype],
+      infoAccess: [Object: null prototype],
+      modulus: 'DCAE58904DC1C4301590355B6E3C8215F52C5CBDE3DBFF7143FA642580D4EE18A24DF066D00A736E1198361764AF379DFDFA4184AFC7AF8CFE1A734DCF339790A2968753832BB9A675482D1D56377BDA31321AD7ACAB06F4AA5D4BB74746DD2A93C3902E798080EF13046A143BB59B92BEC207654EFCDAFCFF7AAEDC5C7E55310CE83907A4D7BE2FD30B6AD2B1DF5FFE5774533B3580DDAE8E4498B39F0ED3DAE0D7F46B29AB44A74B58846D924B81C3DA738B129748900445751ADD37319792E8CD540D3BE4C13F395E2EB8F35C7E108E8641008D456647B0A165CEA0AA29094EF397EBE82EAB0F72A7300EFAC7F4FD1477C3A45B2857C2B3F982FDB745589B',
+      bits: 2048,
+      exponent: '0x10001',
+      pubkey: <Buffer 30 82 01 22 30 0d 06 09 2a 86 48 86 f7 0d 01 01 01 05 00 03 82 01 0f 00 30 82 01 0a 02 82 01 01 00 dc ae 58 90 4d c1 c4 30 15 90 35 5b 6e 3c 82 15 f5 ... 244 more bytes>,
+      valid_from: 'Mar  8 12:00:00 2013 GMT',
+      valid_to: 'Mar  8 12:00:00 2023 GMT',
+      fingerprint: '1F:B8:6B:11:68:EC:74:31:54:06:2E:8C:9C:C5:B1:71:A4:B7:CC:B4',
+      fingerprint256: '15:4C:43:3C:49:19:29:C5:EF:68:6E:83:8E:32:36:64:A0:0E:6A:0D:82:2C:CC:95:8F:B4:DA:B0:3E:49:A0:8F',
+      serialNumber: '01FDA3EB6ECA75C888438B724BCFBC91',
+      raw: <Buffer 30 82 04 94 30 82 03 7c a0 03 02 01 02 02 10 01 fd a3 eb 6e ca 75 c8 88 43 8b 72 4b cf bc 91 30 0d 06 09 2a 86 48 86 f7 0d 01 01 0b 05 00 30 61 31 0b ... 1126 more bytes>,
+      issuerCertificate: [Object]
+    }
+  },
+  code: 'ERR_TLS_CERT_ALTNAME_INVALID'
+}

@@ -1,0 +1,138 @@
+Connected to 75.101.155.12:21
+< 220 Service ready for new user.
+Login security: No encryption
+> USER dealexpress
+< 331 User name okay, need password for dealexpress.
+> PASS ###
+< 230 User logged in, proceed.
+> TYPE I
+< 200 Command TYPE okay.
+> STRU F
+< 200 Command STRU okay.
+> OPTS UTF8 ON
+< 200 Command OPTS okay.
+> OPTS MLST type;size;modify;unique;unix.mode;unix.owner;unix.group;unix.ownername;unix.groupname;
+< 200 Command OPTS okay.
+Trying to find optimal transfer strategy...
+> EPSV
+< 229 Entering Passive Mode (|||1956|)
+Optimal transfer strategy found.
+> MLSD /Development/
+< 150 File status okay; about to open data connection.
+Downloading from 75.101.155.12:1956 (No encryption)
+< 226 Closing data connection.
+Type=dir;Size=0;Modify=20180228211946.675; bush
+Type=dir;Size=0;Modify=20190109140536.365; manhattancomfort
+Type=dir;Size=0;Modify=20190705190528.162; NotionsMarketing
+Type=dir;Size=0;Modify=20190830144017.572; officedepot
+Type=file;Size=1149;Modify=20191122230532.669; DC_LOCATION_20191122.csv.zip
+Type=file;Size=1149;Modify=20200115214719.228; DC_LOCATION_20200115.csv.zip
+Type=file;Size=0;Modify=20200122200047.135; README_FTP.md
+Type=file;Size=9963565;Modify=20200115215525.232; WWWProduct_SKU_LOC_20200115.csv.zip
+
+[
+  FileInfo {
+    name: 'bush',
+    type: 2,
+    size: 0,
+    rawModifiedAt: '2018-02-28T21:19:46.675Z',
+    modifiedAt: 2018-02-28T21:19:46.675Z,
+    permissions: undefined,
+    hardLinkCount: undefined,
+    link: undefined,
+    group: undefined,
+    user: undefined,
+    uniqueID: undefined
+  },
+  FileInfo {
+    name: 'manhattancomfort',
+    type: 2,
+    size: 0,
+    rawModifiedAt: '2019-01-09T14:05:36.365Z',
+    modifiedAt: 2019-01-09T14:05:36.365Z,
+    permissions: undefined,
+    hardLinkCount: undefined,
+    link: undefined,
+    group: undefined,
+    user: undefined,
+    uniqueID: undefined
+  },
+  FileInfo {
+    name: 'NotionsMarketing',
+    type: 2,
+    size: 0,
+    rawModifiedAt: '2019-07-05T19:05:28.162Z',
+    modifiedAt: 2019-07-05T19:05:28.162Z,
+    permissions: undefined,
+    hardLinkCount: undefined,
+    link: undefined,
+    group: undefined,
+    user: undefined,
+    uniqueID: undefined
+  },
+  FileInfo {
+    name: 'officedepot',
+    type: 2,
+    size: 0,
+    rawModifiedAt: '2019-08-30T14:40:17.572Z',
+    modifiedAt: 2019-08-30T14:40:17.572Z,
+    permissions: undefined,
+    hardLinkCount: undefined,
+    link: undefined,
+    group: undefined,
+    user: undefined,
+    uniqueID: undefined
+  },
+  FileInfo {
+    name: 'DC_LOCATION_20191122.csv.zip',
+    type: 1,
+    size: 1149,
+    rawModifiedAt: '2019-11-22T23:05:32.669Z',
+    modifiedAt: 2019-11-22T23:05:32.669Z,
+    permissions: undefined,
+    hardLinkCount: undefined,
+    link: undefined,
+    group: undefined,
+    user: undefined,
+    uniqueID: undefined
+  },
+  FileInfo {
+    name: 'DC_LOCATION_20200115.csv.zip',
+    type: 1,
+    size: 1149,
+    rawModifiedAt: '2020-01-15T21:47:19.228Z',
+    modifiedAt: 2020-01-15T21:47:19.228Z,
+    permissions: undefined,
+    hardLinkCount: undefined,
+    link: undefined,
+    group: undefined,
+    user: undefined,
+    uniqueID: undefined
+  },
+  FileInfo {
+    name: 'README_FTP.md',
+    type: 1,
+    size: 0,
+    rawModifiedAt: '2020-01-22T20:00:47.135Z',
+    modifiedAt: 2020-01-22T20:00:47.135Z,
+    permissions: undefined,
+    hardLinkCount: undefined,
+    link: undefined,
+    group: undefined,
+    user: undefined,
+    uniqueID: undefined
+  },
+  FileInfo {
+    name: 'WWWProduct_SKU_LOC_20200115.csv.zip',
+    type: 1,
+    size: 9963565,
+    rawModifiedAt: '2020-01-15T21:55:25.232Z',
+    modifiedAt: 2020-01-15T21:55:25.232Z,
+    permissions: undefined,
+    hardLinkCount: undefined,
+    link: undefined,
+    group: undefined,
+    user: undefined,
+    uniqueID: undefined
+  }
+]
