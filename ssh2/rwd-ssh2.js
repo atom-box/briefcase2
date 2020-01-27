@@ -58,7 +58,7 @@ case 'd':
                     d =  new Date(list[i].attrs.mtime * 1000);
                     d = regex1.exec(d);
                     s =  list[i].attrs.size;
-                    if (s === undefined) { s = 'f'}
+                    if (s === undefined) { s = 'dir'}
                     n = list[i].filename 
                     console.log('\t' + d 
                         + '\t' + s
