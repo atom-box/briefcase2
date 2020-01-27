@@ -3,9 +3,9 @@
 
 // Useage: Prints directories by default.  Reads and writes if r or w options at CLI
 // To download a file:    
-// node rwd-ssh2.js r  localpath.txt    remotepath.txt
+// node rwd-ssh2.js g  localpath.txt    remotepath.txt
 // To upload a file:    
-// node rwd-ssh2.js w  localpath.txt    remotepath.txt
+// node rwd-ssh2.js p  localpath.txt    remotepath.txt
 require('dotenv').config(); // get environmental variables
 
 
@@ -21,35 +21,44 @@ const connSettings = {
 };
 
 const conn = new Client();
-if ('undefined' === process.argv[2] || !['r', 'w'].includes(process.argv[2]) ){
+if ('undefined' === process.argv[2] || !['p', 'g'].includes(process.argv[2]) ){
     process.argv[2] = 'd';
 }
+
 switch (process.argv[2]) {
+case 'd': 
+    console.log('Get directory listing! ' + process.argv[2] );
+    listFilesShow();
+    break;
+case 'p':
+    console.log('Put file pathA to pathB!' + process.argv[2] );
+    putShow();
+    break;
+case 'g':
+    console.log('Get file; localA from remoteB' + process.argv[2] );
+    getShow();
+    break;
+default:
+    console.log(`Should never see this.` + process.argv[2] );// todo
+}
+
+
 
 
 /////////////////////////////////////////////////////////////
-case 'd': 
+
+function listFilesShow(){
     conn.on('ready', function() {
         let whichDir = "/Development/";
-        // console.log('Client :: ready, especially with this password [' + process.env.FTP_PASSWORD + ']');
         conn.sftp(function(err, sftp) {            
             if (err) throw err;
 
             sftp.readdir(whichDir, function(err, list) {
                 if (err) throw err;
-                // List the directory in the console
-                // console.log(`Length of filesarray is [${list.length -1}] and type is ${typeof list}.`);
+ 
+                // Useful to uncomment if you need to inspect the LIST object
                 // console.dir(Object.keys(list));
-
-
-            console.dir(list);
-            console.log('that is the object');
-
-
-
-
-
-
+ 
                 const regex1 = /\w+\ \d+\ \d+\ \d+:\d+/i; 
                 i = list.length -1, 
                 d = new Date()
@@ -64,17 +73,14 @@ case 'd':
                         + '\t' + s
                         + '\t' + n);
                 }
-                // Do not forget to close the connection, otherwise you'll get troubles
                 conn.end();
             });
-                // console.log(`...Ta Ta ${process.env.OFFSUP_USER}.`);
         });
     }).connect(connSettings);
-    break;
+}
 
 
-/////////////////////////////////////////////////////////////
-case 'w':
+function putShow(){
     conn.on('ready', () => {
          conn.sftp(function(err, sftp) {
             if (err) throw err;
@@ -103,17 +109,15 @@ case 'w':
             
         });
     }).connect(connSettings);
-    break;
+}
 
-
-/////////////////////////////////////////////////////////////
-case 'r':
+function getShow(){
     conn.on('ready', function() {
         conn.sftp(function(err, sftp) {
             if (err) throw err;
             distalpath = '/Development/' + process.argv[4];  
             localpath = process.argv[3];
-            console.log(`Download.\nGet from ${distalpath}...`);
+            console.log(`Upload.\nfrom ${distalpath}...`);
             console.log(`Write to ${localpath}...`);
             // const moveFrom = "/remote/file/path/file.txt";
             // const moveTo = "/local/file/path/file.txt";
@@ -124,13 +128,5 @@ case 'r':
             });
         });
     }).connect(connSettings);
-    break;
 
-
-/////////////////////////////////////////////////////////////
-    default:
-        console.log(`Should never see this.`);// todo
 }
-
-
-
