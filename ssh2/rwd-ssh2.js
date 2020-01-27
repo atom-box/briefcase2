@@ -16,6 +16,7 @@ const connSettings = {
      port: 22, // Normal is 22 port
      username: process.env.OFFSUP_USER,
      password: process.env.OFFSUP_PASS,
+     // privateKey: require('fs').readFileSync(process.env.EVAN_KEY),
      // You can use a key file too, read the ssh2 documentation
 };
 
@@ -28,21 +29,45 @@ switch (process.argv[2]) {
 
 /////////////////////////////////////////////////////////////
 case 'd': 
-    console.log(`Hello ${process.env.OFFSUP_USER}...`);
-
     conn.on('ready', function() {
         let whichDir = "/Development/";
-        console.log('Client :: ready, especially with this password [' + process.env.FTP_PASSWORD + ']');
+        // console.log('Client :: ready, especially with this password [' + process.env.FTP_PASSWORD + ']');
         conn.sftp(function(err, sftp) {            
             if (err) throw err;
+
             sftp.readdir(whichDir, function(err, list) {
                 if (err) throw err;
                 // List the directory in the console
-                console.dir(list);
+                // console.log(`Length of filesarray is [${list.length -1}] and type is ${typeof list}.`);
+                // console.dir(Object.keys(list));
+
+
+            console.dir(list);
+            console.log('that is the object');
+
+
+
+
+
+
+                const regex1 = /\w+\ \d+\ \d+\ \d+:\d+/i; 
+                i = list.length -1, 
+                d = new Date()
+                n = '';
+                for (; i >= 0; i--){
+                    d =  new Date(list[i].attrs.mtime * 1000);
+                    d = regex1.exec(d);
+                    s =  list[i].attrs.size;
+                    if (s === undefined) { s = 'f'}
+                    n = list[i].filename 
+                    console.log('\t' + d 
+                        + '\t' + s
+                        + '\t' + n);
+                }
                 // Do not forget to close the connection, otherwise you'll get troubles
                 conn.end();
             });
-                console.log(`...Ta Ta ${process.env.OFFSUP_USER}.`);
+                // console.log(`...Ta Ta ${process.env.OFFSUP_USER}.`);
         });
     }).connect(connSettings);
     break;
@@ -53,7 +78,7 @@ case 'w':
     conn.on('ready', () => {
          conn.sftp(function(err, sftp) {
             if (err) throw err;
-            console.log(`Hello ${process.env.OFFSUP_USER}...`);
+            // console.log(`Hello ${process.env.OFFSUP_USER}...`);
             distalpath = '/Development/' + process.argv[4];  
             localpath = process.argv[3];
             console.log(`Get from ${localpath}...`);
