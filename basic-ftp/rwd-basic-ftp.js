@@ -41,13 +41,49 @@ default:
 
 async function listFiles() {
     const client = new ftp.Client();
-    console.log(`Host will be: ${process.env.FTP_HOST}.`);
+    console.log(`Host will be: ${connSettings.host}.`);
     client.ftp.verbose = false;
     try {
         await client.access(connSettings)
-        console.log('Client :: ready, especially with this password [' + process.env.FTP_PASSWORD + ']');
+        console.log('Client :: ready, especially with a password [' + connSettings.password.length + '] chars long.');
 ////////////////////process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
-        console.dir(await client.list(remotePathToList));
+            console.log(`Path to check is ${remotePathToList}`);
+            // console.log(`Type of client ${typeof client}`)
+            //  console.log(`Type of client.list(remotePathToList) ${typeof client.list(remotePathToList)}`)
+            const list = await client.list(remotePathToList);
+            console.log(`Length/type of list are ${list.length} AND ${typeof list}`)
+
+            const regex1 = /\w+\ \d+\ \d+\ \d+:\d+/i; 
+            i = list.length - 1, 
+            d = new Date(),
+            n = '';
+            for (; i >= 0; i--){
+                // console.log(`Array is ${list.length} items.  Now looking at array position ${i}`);
+                d =  list[i].modifiedAt;
+                // console.log(i + ' - ' + d);
+                // console.dir(d);
+                // d =  new Date(list[i].FileInfo.modifiedAt * 1000);
+                d = regex1.exec(d);
+                s =  list[i].size;
+                if (list[i].type === 2) { s = 'dir'}
+                n = list[i].name 
+                console.log('\t' + d 
+                    + '\t' + s
+                    + '\t' + n);
+            }
+
+
+
+
+
+
+
+        // console.dir(await client.list(remotePathToList));
+
+
+
+
+
     }
     catch(err) {
         console.log(err);
