@@ -6,7 +6,7 @@ Todos, Monday:
 * add the funcs at bottom
 * then add them to ftp
 * test each manually
-* where to put...
+* where to put...original one is at  
 
  
 
