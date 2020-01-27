@@ -1,0 +1,1099 @@
+
+
+
+            I know the docs are lacking for this new feature [1].  There are three stories [2, 3, 4] coming up related to this.
+
+            I guess I'd like to try 
+            BUILDING THE REST OF THE DOCS FOR THIS 
+            out of what needs explanation, rather than what I think the questions are going to be. 
+
+            [1] http://dash.officesupply-dev.com/documentation/OfficeSupply/src/DealExpress/ExtrasBundle/Resources/doc/ftprpc/index.html
+            [2] Outbound: https://www.pivotaltracker.com/story/show/170713009
+            [3] Inbound: https://www.pivotaltracker.com/story/show/170713061
+            [4] Scan inbound: https://www.pivotaltracker.com/story/show/170713299
+
+
+            What are items that need explaining about these things?
+                                                ::::::::::::::
+                                                ::::::::::::::
+                                                ::::::::::::::
+                                                ::::::::::::::
+                                                ::::::::::::::
+
+                                                                                            ::::::::
+                                                                                            ::::::::
+                                                                                            ::::::::
+
+
+            ----------------------------------------------------------------------------------- R  A  Y  S  L  A  C  K
+            new messages
+            Ray Rehbein 9:27 AM
+            The existing lambda mostely landed in 
+            http://source.staging-officesupply.officesupply-dev.com/deploy/lambda/  
+            or 
+            your local copy of the project in the folder: deploy/lambda/ (edited) 
+
+            Ray Rehbein 9:37 AM
+            As for the Existing FTP, I'm not sure the raw php code will be easier to read than the descriptions of what needs created.  
+
+            A part though that could be taken from the current code is the ftp server to test against.
+            officesupply.ftp.server="ftp1.officesupply.com"
+            officesupply.ftp.username="dealexpress"
+            officesupply.ftp.password="Nt7TziML4j38hpaQwuJd"
+            This user has read access to a wide range of the files, but only has write access in the "/Development/" path.
+            This server has support enabled for ftp, ftps and sftp
+
+
+
+                                                ::::::::::::::
+                                                ::::::::::::::
+                                                ::::::::::::::
+                                                ::::::::::::::
+                                                ::::::::::::::
+
+            ----------------------------------------------------------------------------------- S T O R Y  Z E R O
+
+
+            Research and suggest which libraries to use.
+                                                                                            ::::::::
+                                                                                            ::::::::
+                                                                                            ::::::::
+            Assumptions:
+
+            1 We'll be using Node.js v10 for this.
+            2 We will not want to require external binaries (ie: not: https://www.npmjs.com/package/ftps, because it just wraps a command line tool)
+            3 We will need to support inbound and outbound operations on ftp, ftps and sftp.
+                                                                                              
+                                                                                            ::::::::
+                                                                                            ::::::::
+                                                                                            ::::::::
+
+            ftp and ftps are related protocols, similar to how http and https are related.
+            sftp is an extension on ssh, rather than any direct relation to ftp/ftps.
+            Note: The stories this blocks have not been updated with notes about moving their overlapping "pick library" to a PoC chore.
+
+
+                                                                                            ::::::::
+                                                                                            ::::::::
+                                                                                            ::::::::
+            For testing, our Development FTP has all three protocols enabled. Testing from WebStack is expected to fail due to egress rules. Either modify your instance's security group, or use a WorkerStack.
+
+
+                                                ::::::::::::::
+                                                ::::::::::::::
+                                                ::::::::::::::
+                                                ::::::::::::::
+                                                ::::::::::::::
+
+
+            -------------------------------------------------------Segregate FTP outbound
+            Create an 
+>>>>>>>>outbound lambda 
+                            ::::::::::::::
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::::::::::::::
+            to mimic our current outbound consumer.  
+
+
+            Our current file-send 
+>>>>>>>>consumer 
+                            ::::::::::::::
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::::::::::::::
+            is a combination of 
+>>>>>>>>"read and validate message is current" 
+                            ::::::::::::::
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::::::::::::::
+            and 
+>>>>>>>>"send file". 
+                            ::::::::::::::
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::::::::::::::
+            The PHP code for these are linked below.
+
+            [SQSS3] http://source.staging-officesupply.officesupply-dev.com/src/DealExpress/ExtrasBundle/Aws/Sqs/S3Consumer.php
+            http://source.staging-officesupply.officesupply-dev.com/src/DealExpress/ExtrasBundle/SendFile/S3Consumer.php
+
+            The send file wraps various 
+>>>>>>>>Dx\FileStore\FileStorageInterface  
+                            ::::::::::::::
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::::::::::::::
+            which handle 
+>>>>>>>>"connect & put file",
+                            ::::::::::::::
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::::::::::::::
+             and 
+    >>>>>>>>decorators 
+                                ::::::::::::::
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::::::::::::::
+             that may modify the target file name to add a prefix.
+
+            [FTP file store] http://source.staging-officesupply.officesupply-dev.com/library/Dx/FileStore/Ftp.php
+            [Name decorator] http://source.staging-officesupply.officesupply-dev.com/library/Dx/FileStore/PrefixStorageRetrieval.php
+
+            It will need to account for 
+>>>>>>>>sftp ftp and ftps. 
+                            ::::::::::::::
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::::::::::::::
+            If the libraries are difficult to work together, we can split the protocols up  (likely sftp and ftp&ftps)
+
+            Part of #170215168
+
+            Out of scope:
+
+            - Getting messages from the server to the function.
+            - Handling retry message on failure.
+            - Configuring Lambda in AWS
+            - Configuring security keys/permissions for Lambda function
+            - Creating s3 buckets and triggers.
+            - Splitting FTP, FTPS and SFTP messages.
+
+            In scope:
+
+>>>>>>>>Writing a function, capable of running on AWS Lambda 
+                            ::::::::::::::
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::::::::::::::
+            preferably using either their Node.js or Python language options.
+
+            Function 
+>>>>>>>>signature 
+                            ::::::::::::::
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::::::::::::::
+            is defined in AWS's docs.
+            - Node.js 
+>>>>>>>>https://docs.aws.amazon.com/lambda/latest/dg/nodejs-prog-model-handler.html
+                            ::::::::::::::
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::::::::::::::
+            - Python https://docs.aws.amazon.com/lambda/latest/dg/python-programming-model-handler-types.html
+
+            The request will be 
+>>>>>>>>formatted per AWS's S3 notification event, 
+                            ::::::::::::::
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::::::::::::::
+            which is in their docs, and significant details of the format can be seen in 
+>>>>>>>>the SQSS3 php script.
+                            ::::::::::::::
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::::::::::::::
+
+            The 
+>>>>>>>>naming scheme 
+                            ::::::::::::::
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::::::::::::::
+            of the file will be `[environment prefix/][service to send to][/name to save as]`
+
+            - environment prefix is optional. It should be an option that can be set in the "lambda environment", which is passed to the function in the "context" argument of the signature.
+
+>>>>>>>>Connection details 
+                            ::::::::::::::
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::::::::::::::
+            will be in an 
+>>>>>>>>encrypted configuration file
+                            ::::::::::::::
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::::::::::::::
+            , which the 
+>>>>>>>>aws-sdk will handle 
+                            ::::::::::::::
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::::::::::::::
+            decrypting. The format is flexible. Currently connection details are in an 
+>>>>>>>>ini format, 
+                            ::::::::::::::
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::::::::::::::
+            but given the function will have to read a json request, switching to a 
+>>>>>>>>json formatted configuration 
+                            ::::::::::::::
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::::::::::::::
+            makes sense.
+
+>>>>>>>>Example step through of process, 
+                            ::::::::::::::
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::::::::::::::
+            happy path only:
+            - Start: function is called.
+                - Request contains:
+                    - Type: Notice of creation
+                    - object key:`demo/officesupply.ftp/foo/bar/baz.txt`
+                    - object eTag: 12345
+                - Context contains:
+                    - prefix `demo/`
+            - Get object, including IfMatch:eTag
+            - Get connection details for `officesupply.ftp`
+                - contents of the configuration include remote server host name, port, protocol, username, password, optional target prefix and a optional service label for the logs.
+            - Connect
+            - Stream object from s3 to ftp service described by `officesupply.ftp` to the remote file `/foo/bar/baz.txt`>>>>>>>>
+                                        ::::::::::::::
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::::::::::::::
+>>>>>>>>READ POSTPENDED LINES ESPECIALLY, ABOVE
+                            ::::::::::::::
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::::::::::::::
+
+            Note: due to some 
+>>>>>>>>object sizes, 
+                            ::::::::::::::
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::::::::::::::
+            and lambda size limitations, avoid storing the object locally. AWS S3 SDK can stream the object. various 
+>>>>>>>>FTP libraries can accept a stream.
+                            ::::::::::::::
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::::::::::::::
+
+            Exception points:
+            1) Notice is not a 
+>>>>>>>>creation event.
+                            ::::::::::::::
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::::::::::::::
+                - Do nothing, no log message or info-only log message
+                - return "success"
+
+            2) Notice is creation of a folder
+                - Do nothing, no log message or info-only log message
+                - return "success"
+
+            3) Get object returns "expired" for the etag value
+                - Do nothing, no log message or info-only log message
+                - return "success"
+
+            4) Unable to connect to remote service
+                - log error message
+                - return failure. The system will handle retrying this request later.
+
+            5) Unable to send object body to remote service
+                - log error message
+                - return failure. The system will handle retrying this request later.
+
+            While splitting FTP, FTPS and SFTP messages is out of scope, if they need to be split, that should be documented/noted.
+            A reason they would need split is if the outbound FTP is significantly different from outbound SFTP so they should be different functions.
+
+>>>>>>>>Example configuration 
+                            ::::::::::::::
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::::::::::::::
+            (not in suggested ini or json format):
+
+            - etilize.spr
+                - Host: ftp.etilize.com
+                - Username: doispr
+                - Password: ...
+                - Protocol: FTP
+                - Port: 21
+                - Label: "Etilize/SPR"
+            - etilize.ingram
+                - Host: ftp.etilize.com
+                - Username: doiingram
+                - Password: ...
+                - Protocol: FTP
+                - Port: 21
+                - Label: "Etilize/Ingram"
+
+            Due to some vendors using the same 
+            FTP host name, a label is sometimes required to distinguish the services/errors 
+>>>>>>>>in the logs 
+                            ::::::::::::::
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::::::::::::::
+            without leaking user names.
+            Suggestions on how to read the configuration:
+             - When label is not set nor defined, default to host name.
+             - When prefix is not set nor defined, default no none or blank.
+
+            The connection configuration format will be 
+>>>>>>>>shared between inbound and outbound services.
+                            ::::::::::::::
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::::::::::::::
+
+            If the sftp protocol is too different, clone this story and scope it to that protocol.
+
+
+                                                ::::::::::::::
+                                                ::::::::::::::
+                                                ::::::::::::::
+                                                ::::::::::::::
+                                                ::::::::::::::
+            ------------------------------------Segregate FTP inbound
+
+            Consume messages from 
+>>>>>>>>builder http://source.staging-officesupply.officesupply-dev.com/src/DealExpress/ExtrasBundle/FtpRpc/RequestBuilder.php
+                            ::::::::::::::
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::::::::::::::
+
+>>>>>>>>Version one:
+                            ::::::::::::::
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::::::::::::::
+            fetch by exact name only.
+            support option for "delete after fetch".
+            no support for "raise error" option.
+            no support for "remove old" or "sort by / preference by" options.
+            The download-to option will actually go to a quarantine bucket for another lambda, but should use a name that can be relayed to the correct location later. ie:
+
+            $builder->to("s3://dx-it-dev/foobar");
+            would go to something like s3://dealexpress-quarantine/dx-it-dev/foobar, so the other lambda can scan and if clean, uploaded to s3://dx-it-dev/foobar
+
+            Support for the other options will be later stories.
+
+            It will need to account for sftp ftp and ftps. If the libraries are difficult to work together, we can split the protocols up (likely sftp and ftp&ftps)
+
+            Related to #170713299, but not dependent on it.
+
+            Part of #170215168
+
+            Out of scope:
+            Getting messages from the server to the function.
+            Handling retry message on failure.
+            Configuring Lambda in AWS
+            Configuring security keys/permissions for Lambda function
+            Creating s3 buckets and triggers.
+            Splitting FTP, FTPS and SFTP messages.
+            Supporting most of the builder's options.
+
+            In scope:
+            Writing a function, capable of running on AWS Lambda preferably using either their Node.js or Python language options.
+            Function signature is defined in AWS's docs.
+
+            Node.js https://docs.aws.amazon.com/lambda/latest/dg/nodejs-prog-model-handler.html
+            Python https://docs.aws.amazon.com/lambda/latest/dg/python-programming-model-handler-types.html
+            The request will be formatted per our request-builder's internal format.
+
+            Examples of expected for version one.
+
+            {
+                "service": "etilize",
+                "raise error": false,
+                "to": "s3://dx-it-dev/foo/bar/baz.txt",
+                "appendBaseName": false,
+                "request": {
+                    "type": "name",
+                    "pattern": "/outbox/feed.txt"
+                }
+            }
+            Request "/outbox/feed.txt" from the FTP server & account described by the identifier "etilize".
+            If the requested file is missing from the remote system
+            because "raise error" is false, just make info logs
+            return success.
+            Note: "raise error is true" is out of scope at this time, but will also return "success".
+            If the requested file is there
+            copy it to "s3://dealexpress-quarantine/dx-it-dev/foo/bar/baz.txt" (dealexpress-quarantine should be a configuration setting)
+            Note: "delete after" is missing in your example. Treat this option as false when unset.
+            Note: If "appendbaseName" is missing for some reason, treat it as false.
+
+            Like the outbound story, if the sftp protocol is too different, clone this story and scope it to that protocol.
+
+>>>>>>>>Version 2
+                            ::::::::::::::
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::::::::::::::
+            From here down may possibly move to a version 2 story.
+            Support for "appendBaseName: true" examples:
+
+            {
+                "service": "etilize",
+                "raise error": false,
+                "to": "s3://dx-it-dev/foo/bar/",
+                "appendBaseName": true,
+                "request": {
+                    "type": "name",
+                    "pattern": "/outbox/feed.txt"
+                }
+            }
+            Request "/outbox/feed.txt" from the FTP server & account described by the identifier "etilize".
+            If the requested file is missing from the remote system
+            because "raise error" is false, just make info logs
+            return success.
+            If the requested file is there
+            copy it to "s3://dealexpress-quarantine/dx-it-dev/foo/bar/feed.txt"
+            Delete "/outbox/feed.txt"
+            Note: the "copy to" ends with the base file name of the requested file.
+
+            {
+                "service": "etilize",
+                "raise error": false,
+                "to": "s3://dx-it-dev/foo/bar_",
+                "appendBaseName": true,
+                "request": {
+                    "type": "name",
+                    "pattern": "/outbox/feed.txt"
+                }
+            }
+            Request "/outbox/feed.txt" from the FTP server & account described by the identifier "etilize".
+            If the requested file is missing from the remote system
+            because "raise error" is false, just make info logs
+            return success.
+            If the requested file is there
+            copy it to "s3://dealexpress-quarantine/dx-it-dev/foo/bar_feed.txt"
+            Delete "/outbox/feed.txt"
+            Note: the action "copy to" ends with the base file name of the requested file and a "/" at the end of the "to" has no special meaning nor any requirement to have "to" end with a "/".
+
+
+                                                ::::::::::::::
+                                                ::::::::::::::
+                                                ::::::::::::::
+                                                ::::::::::::::
+                                                ::::::::::::::
+
+
+
+            ----------------------------------------------------------Segregate FTP scan inbound
+            Scan items in a quarantine bucket, and move them to the correct location if clean.
+
+            Related to #170713061, but not dependent on it.
+
+            Files will arrive in locations like s3://dealexpress-quarantine/dx-it-dev/foobar.
+            If scan finds nothing, copy it to s3://dx-it-dev/foobar.
+
+            For version one:
+            If scan does find something, just put the message into the dead-letter queue.
+
+            A later version of this may redefine a different reaction to infected/suspect.
+
+            The example dealexpress-quarantine should be a configuration option read from the environment, which AWS Lambda passes to the function in the context argument.
+
+            Part of #170215168
+
+            There are various blogs about setting up a virus scanner from Lambda for scanning S3 on object creation.
+
+            Out of scope:
+
+            Handling retry message on failure.
+            Configuring Lambda in AWS
+            Configuring security keys/permissions for Lambda function
+            Creating s3 buckets and triggers.
+            Google search term: "lambda s3 scanner"
+
+            Some example blogs and code:
+
+            https://engineering.upside.com/s3-antivirus-scanning-with-lambda-and-clamav-7d33f9c5092e
+            https://blog.truework.com/2018-07-09-s3-antivirus-lambda-function/
+            https://github.com/upsidetravel/bucket-antivirus-function
+            https://stackoverflow.com/questions/58095984/scan-files-in-aws-s3-bucket-for-virus-using-lambda
+            ... one of the stackoverflow comments mentions using step-function rather than lambda, which may be worth exploring further.
+
+            For testing, checkout EICAR https://eicar.org/ . They provide a 68 byte file the virus scanners have has there "hello world / hello scanner", for testing scanner behavior without distributing real viruses. There likely will be errors attempting to directly attach the EICAR file to stories or PRs.
+
+                                                ::::::::::::::
+                                                ::::::::::::::
+                                                ::::::::::::::
+                                                ::::::::::::::
+                                                ::::::::::::::
+
+            -------------------------------------------------------D  O  C  S
+
+            FTP RPC
+            FTP via remote procedure call
+
+            (((FTP AND FTPS ARE PROBLEMATIC TO SECURE.  The Passive mode of FTP creates a security vulnerability.  Our solution to that will be to segregate the FTP process.  We will configure our site so that FTP will be able to send and receive freely, including in passive mode, but will only directly access an S3 bucket in our services.  A lambda function will then scan and transfer the S3 contents and transfer them to ______.   )))
+
+            Due to technical details of how the FTP and FTPS protocol are defined, systems that transfer files via FTP require a firewall with mostly open egress rules.
+
+            FTP RPC segregates the open egress requirement from the rest of the system(s).
+
+            The system is asynchronous and does not 
+>>>>>>>>return a response to the initiator.
+                            ::::::::::::::
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::x
+                            ::::::::::::::
+
+            Outbound
+
+            Name    Description
+            Uploader    Outbound initiator
+            Storage Shared storage
+            Queue   Message queue
+            From Open Egress
+
+            Name    Description
+            Storage Shared storage
+            Queue   Message queue
+            Consumer    Message consumer
+            Remote  Remote / Vendor FTP
+            As of writing:
+
+            “Shared storage” is AWS S3, which supports creating queue messages.
+            “Message queue” is AWS SQS
+            “Consumer” will be AWS Lambda
+            Inbound
+            Starts with a request message sent describing the inbound request.
+
+            From Open Egress
+
+            Name    Description
+            Storage Shared storage
+            Queue   Message queue
+            Consumer    Message consumer
+            Remote  Remote / Vendor FTP
+            As of writing:
+
+            “Shared storage” is AWS S3
+            AWS S3 supports creating queue messages on object creation events, delaying the need for consumer creating ack-notifications.
+            The use cases encapsulate the file-listing usages, meaning there is no need to send a “this is the file list” response.
+            “Message queue” is AWS SQS
+
+            “Consumer” will be AWS Lambda
+
+            For inbound requests, there is an expectation that there will be a later file-consumer that handles continuing the activates that happen after file has been acquired, either by queue-watching or storage-polling.
+
+
+
+
+            ---------------- run        Ray's       unmodified             script :)
+            ---------------- run        Ray's       unmodified             script :)
+            ---------------- run        Ray's       unmodified             script :)
+            ---------------- run        Ray's       unmodified             script :)
+            ---------------- run        Ray's       unmodified             script :)
+
+            egenest@u20190909: ~/projects/ftp-segregate $ node try.js
+            Connected to 75.101.155.12:21
+
+            < 220 Service ready for new user.
+            Login security: No encryption
+
+            > USER dealexpress
+
+            < 331 User name okay, need password for dealexpress.
+
+            > PASS ###
+
+            < 230 User logged in, proceed.
+
+            > TYPE I
+
+            < 200 Command TYPE okay.
+
+            > STRU F
+
+            < 200 Command STRU okay.
+
+            > OPTS UTF8 ON
+
+            < 200 Command OPTS okay.
+
+            > OPTS MLST type;size;modify;unique;unix.mode;unix.owner;unix.group;unix.ownername;unix.groupname;
+
+            < 200 Command OPTS okay.
+            Trying to find optimal transfer strategy...
+
+            > EPSV
+
+            < 229 Entering Passive Mode (|||1396|)
+            Optimal transfer strategy found.
+
+            > MLSD /Development/
+
+            < 150 File status okay; about to open data connection.
+            Downloading from 75.101.155.12:1396 (No encryption) ## DIFFERENT PORT
+
+            < 226 Closing data connection.
+            Type=dir;Size=0;Modify=20180228211946.675; bush
+            Type=dir;Size=0;Modify=20190109140536.365; manhattancomfort
+            Type=dir;Size=0;Modify=20190705190528.162; NotionsMarketing
+            Type=dir;Size=0;Modify=20190830144017.572; officedepot
+            Type=file;Size=1149;Modify=20191122230532.669; DC_LOCATION_20191122.csv.zip
+            Type=file;Size=1149;Modify=20200115214719.228; DC_LOCATION_20200115.csv.zip
+            Type=file;Size=9963565;Modify=20200115215525.232; WWWProduct_SKU_LOC_20200115.csv.zip
+
+            [
+              FileInfo {
+                name: 'bush',
+                type: 2,
+                size: 0,
+                rawModifiedAt: '2018-02-28T21:19:46.675Z',
+                modifiedAt: 2018-02-28T21:19:46.675Z,
+                permissions: undefined,
+                hardLinkCount: undefined,
+                link: undefined,
+                group: undefined,
+                user: undefined,
+                uniqueID: undefined
+              },
+              FileInfo {
+                name: 'manhattancomfort',
+                type: 2,
+                size: 0,
+                rawModifiedAt: '2019-01-09T14:05:36.365Z',
+                modifiedAt: 2019-01-09T14:05:36.365Z,
+                permissions: undefined,
+                hardLinkCount: undefined,
+                link: undefined,
+                group: undefined,
+                user: undefined,
+                uniqueID: undefined
+              },
+              FileInfo {
+                name: 'NotionsMarketing',
+                type: 2,
+                size: 0,
+                rawModifiedAt: '2019-07-05T19:05:28.162Z',
+                modifiedAt: 2019-07-05T19:05:28.162Z,
+                permissions: undefined,
+                hardLinkCount: undefined,
+                link: undefined,
+                group: undefined,
+                user: undefined,
+                uniqueID: undefined
+              },
+              FileInfo {
+                name: 'officedepot',
+                type: 2,
+                size: 0,
+                rawModifiedAt: '2019-08-30T14:40:17.572Z',
+                modifiedAt: 2019-08-30T14:40:17.572Z,
+                permissions: undefined,
+                hardLinkCount: undefined,
+                link: undefined,
+                group: undefined,
+                user: undefined,
+                uniqueID: undefined
+              },
+              FileInfo {
+                name: 'DC_LOCATION_20191122.csv.zip',
+                type: 1,
+                size: 1149,
+                rawModifiedAt: '2019-11-22T23:05:32.669Z',
+                modifiedAt: 2019-11-22T23:05:32.669Z,
+                permissions: undefined,
+                hardLinkCount: undefined,
+                link: undefined,
+                group: undefined,
+                user: undefined,
+                uniqueID: undefined
+              },
+              FileInfo {
+                name: 'DC_LOCATION_20200115.csv.zip',
+                type: 1,
+                size: 1149,
+                rawModifiedAt: '2020-01-15T21:47:19.228Z',
+                modifiedAt: 2020-01-15T21:47:19.228Z,
+                permissions: undefined,
+                hardLinkCount: undefined,
+                link: undefined,
+                group: undefined,
+                user: undefined,
+                uniqueID: undefined
+              },
+              FileInfo {
+                name: 'WWWProduct_SKU_LOC_20200115.csv.zip',
+                type: 1,
+                size: 9963565,
+                rawModifiedAt: '2020-01-15T21:55:25.232Z',
+                modifiedAt: 2020-01-15T21:55:25.232Z,
+                permissions: undefined,
+                hardLinkCount: undefined,
+                link: undefined,
+                group: undefined,
+                user: undefined,
+                uniqueID: undefined
+              }
+            ]
+
+            > EPSV
+            < 229 Entering Passive Mode (|||1391|)
+            > RETR /Development/DC_LOCATION_20200115.csv.zip
+            < 150 File status okay; about to open data connection.
+            Downloading from 75.101.155.12:1391 (No encryption)
+            < 226 Transfer complete.
+            egenest@u20190909: ~/projects/ftp-segregate $ 

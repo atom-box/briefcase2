@@ -1,0 +1,143 @@
+
+This is  a part two to notes
+LOST THE OLD 'PART I' NOTES FILE.   DROPBOX?
+
+Todos, Monday:
+* add the funcs at bottom
+* then add them to ftp
+* test each manually
+* where to put...
+
+ 
+
+
+
+
+
+
+
+
+conn.on('ready', function() {
+    conn.sftp(function(err, sftp) {
+        if (err) throw err;
+        
+        var moveFrom = "/remote/file/path/file.txt";
+        var moveTo = "/local/file/path/file.txt";
+
+        sftp.fastGet(moveFrom, moveTo , {}, function(downloadError){
+            if(downloadError) throw downloadError;
+
+            console.log("Succesfully uploaded");
+        });
+    });
+
+
+
+
+
+var conn = new Client();
+conn.on('ready', function() {
+    conn.sftp(function(err, sftp) {
+         if (err) throw err;
+         
+        var fs = require("fs"); // Use node filesystem
+        var readStream = fs.createReadStream( "path-to-local-file.txt" );
+        var writeStream = sftp.createWriteStream( "path-to-remote-file.txt" );
+
+        writeStream.on('close',function () {
+            console.log( "- file transferred succesfully" );
+        });
+
+        writeStream.on('end', function () {
+            console.log( "sftp connection closed" );
+            conn.close();
+        });
+
+        // initiate transfer of file
+        readStream.pipe( writeStream );
+    });
+}).connect(connSettings);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+conn.on('ready', function() {
+    conn.sftp(function(err, sftp) {
+         if (err) throw err;
+         if ('undefined' === process.argv[2] || !['r', 'w'].includes(process.argv[2]) ){
+            process.argv[2] = 'd';
+         }
+
+
+
+    sftp.readdir(remotePathToList, function(err, list) {
+    if (err) throw err;
+    // List the directory in the console
+    console.dir(list);
+    // Do not forget to close the connection, otherwise you'll get troubles
+ 
+    });
+
+             console.log(`...Ta Ta ${process.env.OFFSUP_USER}.`)
+         conn.end();
+    });
+
+
+
+
+
+
+
+
+
+
+        // SILENT.  NO ERRORS BUT NOTHING MOVES
+        var moveFrom = '/Development/' + process.argv[4];  
+        var moveTo = process.argv[3];
+        console.log(`Get from ${moveFrom}...`);
+        console.log(`Write to ${moveTo}...`);
+        sftp.fastGet(moveFrom, moveTo , {}, function(downloadError){
+            if(downloadError) throw downloadError;
+            console.log("Succesfully xxxxloaded");
+        });
+
+
+
+
+
+conn.on('ready', function() {
+    conn.sftp(function(err, sftp) {
+        if (err) throw err;
+        
+        var moveFrom = "/remote/file/path/file.txt";
+        var moveTo = "/local/file/path/file.txt";
+
+        sftp.fastGet(moveFrom, moveTo , {}, function(downloadError){
+            if(downloadError) throw downloadError;
+
+            console.log("Succesfully uploaded");
+        });
+    });
+}).connect(connSettings);
+
+
+MTIME
+The way modification time will be used is in the requests like "get file name:X, only if newer that time:Y ..."  and "delete all files matching pattern, older than time:Z"  so only used in conditions.
+
+OTROS
+ list(pattern), 
+ get(file_name), 
+ put(file_name, 
+ content), 
+ get-modified(file_name)
