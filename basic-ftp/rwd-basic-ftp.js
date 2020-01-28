@@ -16,7 +16,7 @@ const connSettings = {
 }
 
 
-if ('undefined' === process.argv[2] || !['la', 'ln', 'lo', 'lp', 'pu', 'ge', 'de'].includes(process.argv[2]) ){
+if ('undefined' === process.argv[2] || !['la', 'ln', 'lo', 'lp', 'lr', 'pu', 'ge', 'de'].includes(process.argv[2]) ){
     process.argv[2] = 'la';
 }
 
@@ -40,6 +40,12 @@ case 'lp':
     console.log('List remote files matching this pattern '  );
     listNamedFiles(process.argv[3]);
     break;
+case 'lr': 
+    console.log('List remote files as raw object '  );
+    listRawFileObject();
+    break;
+
+
 
 // case 'pu':
 //     console.log('Put file pathA to pathB.');
@@ -88,6 +94,19 @@ async function listAllFiles() {
 }
 
 
+// For development only=
+async function listRawFileObject() {
+    const client = new ftp.Client();
+    client.ftp.verbose = false;
+    try {
+        await client.access(connSettings);
+        console.dir(await client.list(remotePathPrefix));
+    }
+    catch(err) {
+        console.log(err);
+    }
+    client.close();
+}
 
 
 
@@ -96,7 +115,43 @@ async function listAllFiles() {
 
 
 async function listNewerFiles(filter) {
-        console.log('Hep!');
+    const client = new ftp.Client();
+    if (undefined === filter   ){
+        console.log('Please enter a date string');
+        return;
+    }
+    let cutOffTime = Date.parse(filter);
+    console.log(`Type of cutofftime is ${typeof cutOffTime }`);
+    console.log(` cutofftime is ${  cutOffTime }`);
+    console.log(`filter is seen as ${filter}`);
+    client.ftp.verbose = false;
+
+    try {
+        await client.access(connSettings);
+        const list = await client.list(remotePathPrefix);
+        const regex1 = /\w+\ \d+\ \d+\ \d+:\d+/i; 
+        let i = list.length - 1, 
+        d = new Date(),
+        n = '';
+        for (; i >= 0; i--){
+            d =  list[i].modifiedAt;
+            console.log(`cutoff: ${cutOffTime} vs ${d}`)
+            if (list[i].modifiedAt < cutOffTime){
+                next;
+            }
+            d = regex1.exec(d);
+            s =  list[i].size;
+            if (list[i].type === 2) { s = 'dir'}
+            n = list[i].name 
+            console.log('\t' + d 
+                + '\t' + s
+                + '\t' + n);
+        }
+    }
+    catch(err) {
+        console.log(err);
+    }
+    client.close();
 }
 
 async function listOlderFiles(filter) {
