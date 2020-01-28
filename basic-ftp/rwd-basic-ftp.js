@@ -116,9 +116,6 @@ async function listNewerFiles(filter) {
         return;
     }
     let cutOffMS = Date.parse(filter);
-    // console.log(`Type of cutoffMS is ${typeof cutOffMS }`);
-    // console.log(` cutoffMS is ${  cutOffMS }`);
-    // console.log(`filter is seen as ${filter}`);
     client.ftp.verbose = false;
 
     try {
@@ -151,15 +148,52 @@ async function listNewerFiles(filter) {
     client.close();
 }
 
-async function listOlderFiles(filter) {
-    console.log('Hwp!');
-}
+
 
 async function listNamedFiles(filter) {
-    console.log('Hyp!');
+    const client = new ftp.Client();
+    if (undefined === filter   ){
+        console.log('*******************\nYou entered no pattern string\n*******************');
+        return;
+    }
+    let cutOffMS = Date.parse(filter);
+    client.ftp.verbose = false;
+
+    try {
+        await client.access(connSettings);
+        const list = await client.list(remotePathPrefix);
+        const regex1 = /\w+\ \d+\ \d+\ \d+:\d+/i,
+        regex2 = new RegExp(filter, 'i'); 
+        let i = list.length - 1, 
+        d = new Date(),
+        n = '',
+        fileMSSince1970 = 0;
+        for (; i >= 0; i--){
+            d =  list[i].modifiedAt;
+            if (!regex2.test(list[i].name)){
+                // console.log(`NO MATCH: [${filter}] and [${list[i].name}] `);
+                continue;
+            }
+            d = regex1.exec(d);
+            s =  list[i].size;
+            if (list[i].type === 2) { s = 'dir'}
+            n = list[i].name;
+            console.log('\t' + d 
+                + '\t' + s
+                + '\t' + n);
+        }
+    }
+    catch(err) {
+        console.log(err);
+    }
+    client.close();
 }
 
 
+
+
+ 
+ 
 async function put(){
     const client = new ftp.Client();
     client.ftp.verbose = true;
@@ -205,26 +239,6 @@ async function remoteDelete(remoteFilename){
     }
     client.close();
 }
-
-
-async function upAndBack(startHerePath, therePath, endHerePath) {
-    const client = new ftp.Client();
-    client.ftp.verbose = true;
-    try {
-        await client.access(connSettings);
-    let startHerePath = process.argv[3];
-    let therePath = remotePathPrefix + process.argv[4];
-    let endHerePath =  process.argv[5];
-    await client.uploadFrom(startHerePath , therePath );
-    await client.downloadTo(endHerePath, therePath);
-    }
-    catch(err) {
-        console.log(err);
-    }
-    client.close();
-} 
-
-
 
 
 
