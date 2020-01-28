@@ -109,21 +109,16 @@ async function listRawFileObject() {
 }
 
 
-
-
-
-
-
 async function listNewerFiles(filter) {
     const client = new ftp.Client();
     if (undefined === filter   ){
         console.log('Please enter a date string');
         return;
     }
-    let cutOffTime = Date.parse(filter);
-    console.log(`Type of cutofftime is ${typeof cutOffTime }`);
-    console.log(` cutofftime is ${  cutOffTime }`);
-    console.log(`filter is seen as ${filter}`);
+    let cutOffMS = Date.parse(filter);
+    // console.log(`Type of cutoffMS is ${typeof cutOffMS }`);
+    // console.log(` cutoffMS is ${  cutOffMS }`);
+    // console.log(`filter is seen as ${filter}`);
     client.ftp.verbose = false;
 
     try {
@@ -132,12 +127,14 @@ async function listNewerFiles(filter) {
         const regex1 = /\w+\ \d+\ \d+\ \d+:\d+/i; 
         let i = list.length - 1, 
         d = new Date(),
-        n = '';
+        n = '',
+        fileMSSince1970 = 0;
         for (; i >= 0; i--){
+            fileMSSince1970 = Date.parse(list[i].modifiedAt);
             d =  list[i].modifiedAt;
-            console.log(`cutoff: ${cutOffTime} vs ${d}`)
-            if (list[i].modifiedAt < cutOffTime){
-                next;
+            // console.log(`${fileMSSince1970} vs cutoff: ${cutOffMS} `)
+            if (fileMSSince1970 < cutOffMS){
+                continue;
             }
             d = regex1.exec(d);
             s =  list[i].size;
