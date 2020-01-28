@@ -45,19 +45,17 @@ case 'lr':
     listRawFileObject();
     break;
 
-
-
-// case 'pu':
-//     console.log('Put file pathA to pathB.');
-//     put(process.argv[3], process.argv[4]);
-//     break;
-// case 'ge':
-//     console.log('Get file; localA from remoteB'  );
-//     get(process.argv[3], process.argv[4]);
-//     break;
-// case 'de':
-//     remoteDelete(process.argv[3]);
-//     break;
+case 'pu':
+    console.log('Put file pathA to pathB.');
+    put(process.argv[3], process.argv[4]);
+    break;
+case 'ge':
+    console.log('Get file; localA from remoteB'  );
+    get(process.argv[3], process.argv[4]);
+    break;
+case 'de':
+    remoteDelete(process.argv[3]);
+    break;
 default:
     console.log(`Should never see this.` + process.argv[2] );// todo
 }
