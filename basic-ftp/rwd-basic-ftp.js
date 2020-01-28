@@ -16,68 +16,53 @@ const connSettings = {
 }
 
 
-if ('undefined' === process.argv[2] || !['ls', 'ln', 'lo', 'pu', 'ge', 'de'].includes(process.argv[2]) ){
-    process.argv[2] = 'ls';
+if ('undefined' === process.argv[2] || !['la', 'ln', 'lo', 'lp', 'pu', 'ge', 'de'].includes(process.argv[2]) ){
+    process.argv[2] = 'la';
 }
 
 
 switch (process.argv[2]) {
-case 'ls': 
+case 'la': 
     console.log('List all remote files. '  );
-    listFiles();
+    listAllFiles();
     break;
 case 'ln': 
     console.log('List remote files newer than... ' + process.argv[3] );
-    listFiles(process.argv[3]);  /////////// todo needs second arg
+    console.log('Using formats (even partially) similar to "2015-03-25" \n"03/25/2015" \n"Mar 25 2015" \n"25 Mar 2015"')
+    listNewerFiles(process.argv[3]);  /////////// todo needs second arg
     break;
 case 'lo': 
     console.log('List remote files older than... '  );
-    listFiles(process.argv[3], -1);
+    console.log('Using formats (even partially) similar to "2015-03-25" \n"03/25/2015" \n"Mar 25 2015" \n"25 Mar 2015"')
+    listOlderFiles(process.argv[3]);
     break;
-case 'ud':
-    console.log('Put clientfile to server and then back again to client!');
-    upAndBack(process.argv[3], process.argv[4], process.argv[5]);
+case 'lp': 
+    console.log('List remote files matching this pattern '  );
+    listNamedFiles(process.argv[3]);
     break;
-case 'pu':
-    console.log('Put file pathA to pathB.');
-    put(process.argv[3], process.argv[4]);
-    break;
-case 'ge':
-    console.log('Get file; localA from remoteB'  );
-    get(process.argv[3], process.argv[4]);
-    break;
-case 'de':
-    remoteDelete(process.argv[3]);
-    break;
+
+// case 'pu':
+//     console.log('Put file pathA to pathB.');
+//     put(process.argv[3], process.argv[4]);
+//     break;
+// case 'ge':
+//     console.log('Get file; localA from remoteB'  );
+//     get(process.argv[3], process.argv[4]);
+//     break;
+// case 'de':
+//     remoteDelete(process.argv[3]);
+//     break;
 default:
     console.log(`Should never see this.` + process.argv[2] );// todo
 }
 
 
-async function listFiles() {
-    // A timeout was considered, for safety during development:  const client = new ftp.Client(timeout = 15000);
+async function listAllFiles() {
     const client = new ftp.Client();
-    let filter = arguments[1];
-
-    // sanity check for options
-    if (filter === undefined){
-        filter = 0;
-    } else if (![-1, 1].includes(filter)) { 
-        filter = 0;
-    } else {
-        filter = filter;
-    }
-
     client.ftp.verbose = false;
-
     try {
         await client.access(connSettings);
-
-
-//////
- const list = await client.list(remotePathPrefix);
-
-
+        const list = await client.list(remotePathPrefix);
         const regex1 = /\w+\ \d+\ \d+\ \d+:\d+/i; 
         let i = list.length - 1, 
         d = new Date(),
@@ -100,6 +85,26 @@ async function listFiles() {
         console.log(err);
     }
     client.close();
+}
+
+
+
+
+
+
+
+
+
+async function listNewerFiles(filter) {
+        console.log('Hep!');
+}
+
+async function listOlderFiles(filter) {
+    console.log('Hwp!');
+}
+
+async function listNamedFiles(filter) {
+    console.log('Hyp!');
 }
 
 
