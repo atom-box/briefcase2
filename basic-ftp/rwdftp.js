@@ -188,26 +188,21 @@ async function listNewerFiles(filter) {
 }
 
 
- function deleteNewerThan(filter) {
+async function deleteNewerThan(filter) {
+    let sneaky = [];
 
-let sneaky = [];
-
-arrayitizeNewerFiles(filter).then( 
-    (n)=>{
-        sneaky.push('AAA');
-        sneaky.push((new Date()).getSeconds());
-        console.dir(n[0] );
-    } 
-    );
-
-sneaky.push('BBB');
-sneaky.push((new Date()).getSeconds());
-let t = 3000000000;
-while (t){t--}
-sneaky.push('CCC');
-sneaky.push((new Date()).getSeconds());
-console.log(`Sneaky sez [${sneaky}]`);
-    // Useful (1) https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/resolve
+    let temp = await arrayitizeNewerFiles(filter);
+    sneaky.push('AAA');
+    sneaky.push(temp);
+    sneaky.push((new Date()).getSeconds());
+    sneaky.push('BBB');
+    sneaky.push((new Date()).getSeconds());
+    let t = 3000000000;
+    while (t){t--}
+    sneaky.push('CCC');
+    sneaky.push((new Date()).getSeconds());
+    console.log(`Sneaky sez [${sneaky}]`);
+        // Useful (1) https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/resolve
 }
 
 
