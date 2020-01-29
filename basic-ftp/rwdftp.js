@@ -112,6 +112,8 @@ async function listRawFileObject() {
 
 
 async function listNewerFiles(filter) {
+    // handles variable date formats by converting both to Internet time
+
     const client = new ftp.Client();
     if (undefined === filter   ){
         console.log('Please enter a date string');
@@ -189,9 +191,16 @@ async function listNewerFiles(filter) {
 
 
 async function deleteNewerThan(filter) {
+    // not efficient; opens and closes the client once per file!
+
     let newFiles = await arrayitizeNewerFiles(filter);
-    console.log(`Filenames: [${newFiles}] \n\nFiles modified after: [${filter}]\nNumber of files: [${newFiles.length}]`);
-        // Useful (1) https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/resolve
+    console.log(`First filename: [${newFiles[0]}] ... Last filename: [${newFiles[newFiles.length - 1]}]\nFiles modified after: [${filter}]\nNumber of files: [${newFiles.length}]`);
+    while(newFiles[0] !== undefined){
+        let doomedFile = newFiles.shift();
+        console.log('Man overboard!  [' + doomedFile + ']');
+        // UNCOMMENT THE FOLLOWING LINE TO ACTUALLY DELETE FILES
+        // remoteDelete(doomedFile);
+    }
 }
 
 
@@ -301,6 +310,7 @@ The two letter options are
 5. LO  list older than
 6. LP  list by filename pattern
 7. LA  list all
+8. DN  delete any files newer than [date]
 
 
 
