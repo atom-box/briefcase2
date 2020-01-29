@@ -154,7 +154,7 @@ async function listNewerFiles(filter) {
 
  
  async function arrayitizeNewerFiles(filter) {
-    console.log(`Filter typeis ${typeof filter} and value ${filter} `)
+    // console.log(`Filter typeis ${typeof filter} and value ${filter} `)
     const client = new ftp.Client();
     if (undefined === filter   ){
         console.log('Please enter a date string');
@@ -189,15 +189,25 @@ async function listNewerFiles(filter) {
 
 
  function deleteNewerThan(filter) {
-     
-let c = arrayitizeNewerFiles(filter).then( (n)=>{console.dir(n[0] )} );
-//      const clone = value => value;
-//      let exampleName = '';
-//      newishFileNames.then(function(result) {
-//     exampleName = result;
-// });
- console.log(`The value of c is [${c}]`)
-    // Useful https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/resolve
+
+let sneaky = [];
+
+arrayitizeNewerFiles(filter).then( 
+    (n)=>{
+        sneaky.push('AAA');
+        sneaky.push((new Date()).getSeconds());
+        console.dir(n[0] );
+    } 
+    );
+
+sneaky.push('BBB');
+sneaky.push((new Date()).getSeconds());
+let t = 3000000000;
+while (t){t--}
+sneaky.push('CCC');
+sneaky.push((new Date()).getSeconds());
+console.log(`Sneaky sez [${sneaky}]`);
+    // Useful (1) https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/resolve
 }
 
 
