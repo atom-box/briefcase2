@@ -189,19 +189,8 @@ async function listNewerFiles(filter) {
 
 
 async function deleteNewerThan(filter) {
-    let sneaky = [];
-
-    let temp = await arrayitizeNewerFiles(filter);
-    sneaky.push('AAA');
-    sneaky.push(temp);
-    sneaky.push((new Date()).getSeconds());
-    sneaky.push('BBB');
-    sneaky.push((new Date()).getSeconds());
-    let t = 3000000000;
-    while (t){t--}
-    sneaky.push('CCC');
-    sneaky.push((new Date()).getSeconds());
-    console.log(`Sneaky sez [${sneaky}]`);
+    let newFiles = await arrayitizeNewerFiles(filter);
+    console.log(`Filenames: [${newFiles}] \n\nFiles modified after: [${filter}]\nNumber of files: [${newFiles.length}]`);
         // Useful (1) https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/resolve
 }
 
