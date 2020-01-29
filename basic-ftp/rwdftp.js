@@ -153,52 +153,51 @@ async function listNewerFiles(filter) {
 
 
  
-async function arrayitizeNewerFiles(filter) {
+ async function arrayitizeNewerFiles(filter) {
+    console.log(`Filter typeis ${typeof filter} and value ${filter} `)
     const client = new ftp.Client();
     if (undefined === filter   ){
         console.log('Please enter a date string');
         return;
     }
-    let cutOffMS = Date.parse(filter);
+    let cutOffMS = Date.parse(filter),
+    filenames = [];
     client.ftp.verbose = false;
 
     try {
         await client.access(connSettings);
         const list = await client.list(remotePathPrefix);
-        const regex1 = /\w+\ \d+\ \d+\ \d+:\d+/i; 
         let i = list.length - 1, 
-        d = new Date(),
-        n = '',
         fileMSSince1970 = 0;
         for (; i >= 0; i--){
             fileMSSince1970 = Date.parse(list[i].modifiedAt);
             d =  list[i].modifiedAt;
-            // console.log(`${fileMSSince1970} vs cutoff: ${cutOffMS} `)
             if (fileMSSince1970 < cutOffMS){
                 continue;
             }
-            d = regex1.exec(d);
-            s =  list[i].size;
             if (list[i].type === 2) { s = 'dir'}
             n = list[i].name 
-            console.log('\t' + d 
-                + '\t' + s
-                + '\t' + n);
+            filenames.push(n);
         }
     }
     catch(err) {
         console.log(err);
     }
-    return ['lorem', 'ipsum', 'foo', 'baz', 'bar'];
     client.close();
+    return filenames;
 }
 
 
-function deleteNewerThan(filter) {
-    // console.log(`DEL newer than received ${filter} at ${new Date()}`);
-    const newishFileNames = arrayitizeNewerFiles(filter);
-    console.log('Returned an array with this many items: ' + newishFileNames.length);
-    console.dir('The array is this: ' + newishFileNames);
+ function deleteNewerThan(filter) {
+     
+let c = arrayitizeNewerFiles(filter).then( (n)=>{console.dir(n[0] )} );
+//      const clone = value => value;
+//      let exampleName = '';
+//      newishFileNames.then(function(result) {
+//     exampleName = result;
+// });
+ console.log(`The value of c is [${c}]`)
+    // Useful https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/resolve
 }
 
 
