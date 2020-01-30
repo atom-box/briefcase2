@@ -67,32 +67,43 @@ function listFilesRaw(){
 }
 
 
+function listFilesShow() {
+    sftp.connect(connSettings).then(() => {
+      return sftp.list(remotePathPrefix);
+    })
+    .then(data => {
+        const regex = /\w+\ \d+\ \d+\ \d+:\d+/i; 
+        i = data.length -1, 
+        d = new Date(),
+        n = '';
+        for (; i >= 0; i--){
+            d =  new Date(data[i].modifyTime * 1000);
+            d = regex.exec(d);
+            s =  data[i].size;
+            if (data[i].type === 'd') { s = 'dir'}
+            n = data[i].name;
+            console.log('\t' + d 
+                + '\t' + s
+                + '\t' + n);
+        }
+    })
+    .then(() => {
+        return sftp.end();
+    })
+    .catch(err => {
+        console.log(err, 'catch error');
+        return sftp.end();
+    });
+}
 
-//     conn.on('ready', function() {
-//         let whichDir = "/Development/";
-//         conn.sftp(function(err, sftp) {            
-//             if (err) throw err;
 
-//             sftp.readdir(whichDir, function(err, list) {
-//                 if (err) throw err;
+
+
+
+
  
-//                 // Useful to uncomment if you need to inspect the LIST object
-//                 // console.dir(Object.keys(list));
- 
-//                 const regex1 = /\w+\ \d+\ \d+\ \d+:\d+/i; 
-//                 i = list.length -1, 
-//                 d = new Date()
-//                 n = '';
-//                 for (; i >= 0; i--){
-//                     d =  new Date(list[i].attrs.mtime * 1000);
-//                     d = regex1.exec(d);
-//                     s =  list[i].attrs.size;
-//                     if (s === undefined) { s = 'dir'}
-//                     n = list[i].filename 
-//                     console.log('\t' + d 
-//                         + '\t' + s
-//                         + '\t' + n);
-//                 }
+
+
 //                 conn.end();
 //             });
 //         });
